@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-from typing import List, Optional
+from pydantic import BaseModel
+from typing import List
 from enum import Enum
+import threading
 
 app = FastAPI(title="Museum Ancient Objects API")
 
@@ -133,8 +134,9 @@ museum_objects = {
     )
 }
 
-# Counter for generating new IDs
+# Counter for generating new IDs with thread-safe lock
 next_id = 11
+id_lock = threading.Lock()
 
 
 @app.get("/")
@@ -170,17 +172,18 @@ def get_object(object_id: int):
 def create_object(obj: MuseumObjectCreate):
     """Create a new museum object"""
     global next_id
-    new_object = MuseumObject(
-        id=next_id,
-        name=obj.name,
-        origin=obj.origin,
-        period=obj.period,
-        material=obj.material,
-        description=obj.description,
-        status=obj.status
-    )
-    museum_objects[next_id] = new_object
-    next_id += 1
+    with id_lock:
+        new_object = MuseumObject(
+            id=next_id,
+            name=obj.name,
+            origin=obj.origin,
+            period=obj.period,
+            material=obj.material,
+            description=obj.description,
+            status=obj.status
+        )
+        museum_objects[next_id] = new_object
+        next_id += 1
     return new_object
 
 
@@ -190,7 +193,6 @@ def delete_object(object_id: int):
     if object_id not in museum_objects:
         raise HTTPException(status_code=404, detail="Object not found")
     del museum_objects[object_id]
-    return None
 
 
 @app.patch("/objects/{object_id}/status", response_model=MuseumObject)
