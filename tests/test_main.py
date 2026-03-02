@@ -359,6 +359,33 @@ def test_objects_requiring_maintenance_includes_urgent():
     assert 5 in object_ids
 
 
+# ─── MAINTENANCE: Constraint Validation ──────────────────────────────────────
+
+def test_schedule_maintenance_invalid_duration_zero():
+    """Test that estimated_duration_hours=0 is rejected"""
+    maintenance_data = {
+        "type": "inspection",
+        "scheduled_date": "2026-04-01",
+        "technician": "Test Technician",
+        "notes": "Should fail",
+        "estimated_duration_hours": 0
+    }
+    response = client.post("/objects/1/maintenance", json=maintenance_data)
+    assert response.status_code == 422
+
+def test_schedule_maintenance_invalid_duration_negative():
+    """Test that negative estimated_duration_hours is rejected"""
+    maintenance_data = {
+        "type": "inspection",
+        "scheduled_date": "2026-04-01",
+        "technician": "Test Technician",
+        "notes": "Should fail",
+        "estimated_duration_hours": -1
+    }
+    response = client.post("/objects/1/maintenance", json=maintenance_data)
+    assert response.status_code == 422
+
+
 # ─── MAINTENANCE: Integration Tests ──────────────────────────────────────────
 
 def test_full_maintenance_workflow():

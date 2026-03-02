@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from enum import Enum
 import threading
@@ -26,8 +26,8 @@ class MuseumObject(BaseModel):
     status: ObjectStatus = ObjectStatus.DISPLAYED
     # Maintenance-related fields
     last_maintenance_date: Optional[str] = None
-    maintenance_interval_days: int = 90  # Default: check every 90 days
-    condition_score: int = 5  # 1-10, where 10 is perfect condition
+    maintenance_interval_days: int = Field(default=90, gt=0)  # Default: check every 90 days
+    condition_score: int = Field(default=5, ge=1, le=10)  # 1-10, where 10 is perfect condition
     maintenance_priority: str = "normal"  # "low", "normal", "high", "urgent"
     fragile: bool = False
     environmental_sensitivity: str = "normal"  # "low", "normal", "high"
@@ -58,7 +58,7 @@ class MaintenanceRecord(BaseModel):
     notes: str
     completed: bool = False
     completed_date: Optional[str] = None
-    estimated_duration_hours: int = 2
+    estimated_duration_hours: int = Field(default=2, gt=0)
     cost_estimate: Optional[float] = None
 
 
@@ -68,7 +68,7 @@ class MaintenanceRecordCreate(BaseModel):
     scheduled_date: str
     technician: str
     notes: str
-    estimated_duration_hours: int = 2
+    estimated_duration_hours: int = Field(default=2, gt=0)
     cost_estimate: Optional[float] = None
 
 
