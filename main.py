@@ -15,6 +15,29 @@ class ObjectStatus(str, Enum):
     TO_OTHER_MUSEUM = "to-other-museum"
 
 
+class MaintenancePriority(str, Enum):
+    """Priority level for object maintenance"""
+    LOW = "low"
+    NORMAL = "normal"
+    HIGH = "high"
+    URGENT = "urgent"
+
+
+class EnvironmentalSensitivity(str, Enum):
+    """Environmental sensitivity level of museum objects"""
+    LOW = "low"
+    NORMAL = "normal"
+    HIGH = "high"
+
+
+class MaintenanceType(str, Enum):
+    """Type of maintenance activity"""
+    CLEANING = "cleaning"
+    RESTORATION = "restoration"
+    INSPECTION = "inspection"
+    PREVENTIVE = "preventive"
+
+
 class MuseumObject(BaseModel):
     """Model for museum objects"""
     id: int
@@ -28,9 +51,9 @@ class MuseumObject(BaseModel):
     last_maintenance_date: Optional[str] = None
     maintenance_interval_days: int = 90  # Default: check every 90 days
     condition_score: int = 5  # 1-10, where 10 is perfect condition
-    maintenance_priority: str = "normal"  # "low", "normal", "high", "urgent"
+    maintenance_priority: MaintenancePriority = MaintenancePriority.NORMAL
     fragile: bool = False
-    environmental_sensitivity: str = "normal"  # "low", "normal", "high"
+    environmental_sensitivity: EnvironmentalSensitivity = EnvironmentalSensitivity.NORMAL
 
 
 class MuseumObjectCreate(BaseModel):
@@ -52,7 +75,7 @@ class MaintenanceRecord(BaseModel):
     """Model for maintenance records"""
     id: int
     object_id: int
-    type: str  # "cleaning", "restoration", "inspection", "preventive"
+    type: MaintenanceType  # "cleaning", "restoration", "inspection", "preventive"
     scheduled_date: str
     technician: str
     notes: str
@@ -64,7 +87,7 @@ class MaintenanceRecord(BaseModel):
 
 class MaintenanceRecordCreate(BaseModel):
     """Model for creating maintenance records"""
-    type: str
+    type: MaintenanceType
     scheduled_date: str
     technician: str
     notes: str
