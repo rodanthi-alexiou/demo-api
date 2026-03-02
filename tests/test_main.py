@@ -84,6 +84,18 @@ def test_create_object_invalid_status():
     assert response.status_code == 422  # FastAPI validation error
 
 
+def test_schedule_maintenance_invalid_type():
+    """Test that an invalid maintenance type is rejected"""
+    maintenance_data = {
+        "type": "polishing",   # not a valid MaintenanceType
+        "scheduled_date": "2026-04-01",
+        "technician": "Test Technician",
+        "notes": "Should fail"
+    }
+    response = client.post("/objects/1/maintenance", json=maintenance_data)
+    assert response.status_code == 422
+
+
 # ─── PATCH status ────────────────────────────────────────────────────────────
 
 def test_update_object_status():
